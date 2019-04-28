@@ -6,10 +6,16 @@ group = 'org.jenkins-ci.plugins'
 version = '0.1-SNAPSHOT'
 description = 'A multibranch SCM filter which searches for .jervis.yml or .travis.yml for filtering branches, tags, and pull requests.'
 
+ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.5.6'
 println "Using Groovy ${groovyVersion}"
-println "Using Gradle ${GradleVersion.current().getVersion()}"
+println "Using Gradle ${gradle.gradleVersion}"
 println "Using Java ${org.gradle.internal.jvm.Jvm.current()}"
 println "Building ${archivesBaseName}-${version}"
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
 
 jenkinsPlugin {
     // version of Jenkins core this plugin depends on, must be 1.420 or later
@@ -82,8 +88,13 @@ jenkinsPlugin {
     }
 }
 
+dependencies {
+    compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
+    compile 'org.yaml:snakeyaml:1.21'
+}
+
 //http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
 //generate gradlew with: gradle wrapper
-task wrapper(type: Wrapper) {
+wrapper {
     gradleVersion = '5.4.1'
 }

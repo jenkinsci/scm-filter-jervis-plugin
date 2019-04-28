@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'org.jenkins-ci.plugins'
-version = '0.1-SNAPSHOT'
+version = version
 description = 'A multibranch SCM filter which searches for .jervis.yml or .travis.yml for filtering branches, tags, and pull requests.'
 
 ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.5.6'
@@ -19,7 +19,7 @@ repositories {
 
 jenkinsPlugin {
     // version of Jenkins core this plugin depends on, must be 1.420 or later
-    coreVersion = '2.7.3'
+    coreVersion = '2.130'
 
     // ID of the plugin, defaults to the project name without trailing '-plugin'
     shortName = 'scm-filter-jervis'
@@ -91,7 +91,18 @@ jenkinsPlugin {
 dependencies {
     compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
     compile 'org.yaml:snakeyaml:1.21'
+    jenkinsPlugins 'org.jenkins-ci.plugins.workflow:workflow-aggregator:2.6'
+    jenkinsPlugins 'org.jenkins-ci.plugins.workflow:workflow-multibranch:2.21'
+    jenkinsPlugins 'org.jenkins-ci.plugins.workflow:workflow-step-api:2.19'
+    jenkinsPlugins 'org.jenkins-ci.plugins:github-branch-source:2.5.0'
+    jenkinsPlugins 'org.jenkins-ci.plugins:scm-api:2.2.2'
+    jenkinsPlugins 'org.jenkins-ci.plugins:token-macro:2.7'
 }
+
+task cleanJenkins(type: Delete) {
+    delete 'work'
+}
+clean.dependsOn cleanJenkins
 
 //http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
 //generate gradlew with: gradle wrapper

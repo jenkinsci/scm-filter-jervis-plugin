@@ -1,9 +1,30 @@
+/*
+    Copyright 2014-2019 Sam Gleske
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    and/or sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+ */
 package net.gleske.scmfilter.impl.trait;
 
 import net.gleske.jervis.remotes.GitHubGraphQL
+import net.gleske.scmfilter.credential.GraphQLTokenCredential
 
-import com.cloudbees.plugins.credentials.CredentialsProvider
-import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials
+import edu.umd.cs.findbugs.annotations.CheckForNull
 import edu.umd.cs.findbugs.annotations.NonNull
 import hudson.Extension
 import jenkins.model.Jenkins
@@ -17,9 +38,10 @@ import jenkins.scm.api.trait.SCMSourceTrait
 import jenkins.scm.api.trait.SCMSourceTraitDescriptor
 import jenkins.scm.api.trait.SCMSourceTraitDescriptor
 import jenkins.scm.impl.trait.Selection
+import org.apache.commons.lang.StringUtils
 import org.jenkinsci.Symbol
-import org.kohsuke.stapler.DataBoundConstructor
 import org.jenkinsci.plugins.github_branch_source.GitHubSCMSource
+import org.kohsuke.stapler.DataBoundConstructor
 
 import groovy.text.SimpleTemplateEngine
 import java.util.logging.Level
@@ -32,13 +54,11 @@ public class JervisFilterTrait extends SCMSourceTrait {
 
     // logger
     private transient static final Logger LOGGER = Logger.getLogger(JervisFilterTrait.name)
+    private static final DEFAULT_YAML_FILE = '.jervis.yml'
     private static final graphql_expr_template = '''
         |query {
         |    repository(owner: "${owner}", name: "${repository}") {
-        |        jervisYaml:object(expression: "${git_ref}:.jervis.yml") {
-        |            ...file
-        |        }
-        |        travisYaml:object(expression: "${git_ref}:.travis.yml") {
+        |        jervisYaml:object(expression: "${git_ref}:${yamlFileName}") {
         |            ...file
         |        }
         |    }
@@ -50,8 +70,21 @@ public class JervisFilterTrait extends SCMSourceTrait {
         |}
         '''.stripMargin().trim()
 
+    @NonNull
+    private final String yamlFileName
+    /**
+      Returns the YAML file name to search for filters.
+
+      @return a yaml file name
+      */
+    String getYamlFileName() {
+        yamlFileName
+    }
+
     @DataBoundConstructor
-    JervisFilterTrait() {}
+    JervisFilterTrait(@CheckForNull String yamlFileName) {
+        this.yamlFileName = StringUtils.defaultIfBlank(yamlFileName, DEFAULT_YAML_FILE);
+    }
 
     private static shouldExclude(def filters_obj, String target_ref) {
         List filters = []
@@ -69,7 +102,7 @@ public class JervisFilterTrait extends SCMSourceTrait {
             }
         }
         if(!filters) {
-            // malformed filter so we should allow by default
+            LOGGER.fine("Malformed filter found on git reference ${target_ref} so we will allow by default")
             return false
         }
         String regex = filters.collect {
@@ -94,20 +127,16 @@ public class JervisFilterTrait extends SCMSourceTrait {
                         return false
                     }
                     def github = new GitHubGraphQL()
+                    github.credential = new GraphQLTokenCredential(source.owner)
+
                     // get GitHub GraphQL API endpoint
                     github.gh_api = ((source.apiUri ?: source.GITHUB_URL) -~ '(/v3)?/?$') + '/graphql'
                     // set credentials for GraphQL API interaction
-                    CredentialsProvider.lookupCredentials(StandardUsernamePasswordCredentials, source.owner, Jenkins.instance.ACL.SYSTEM).find {
-                        it.id == source.credentialsId
-                    }.with {
-                        if(it?.password?.plainText) {
-                            github.token = it.password.plainText
-                        }
-                    }
 
                     Map binding = [
                         owner: source.repoOwner,
-                        repository: source.repository
+                        repository: source.repository,
+                        yamlFileName: yamlFileName
                     ]
                     String target_ref = ''
                     if(head instanceof ChangeRequestSCMHead) {
@@ -131,12 +160,7 @@ public class JervisFilterTrait extends SCMSourceTrait {
                     Map response = github.sendGQL(graphql_query)
                     String yaml_text = ''
                     response?.get('data')?.get('repository').with {
-                        if(it?.get('jervisYaml')?.get('text')?.trim()) {
-                            yaml_text = it?.get('jervisYaml')?.get('text')?.trim()
-                        }
-                        else if(it?.get('travisYaml')?.get('text')?.trim()) {
-                            yaml_text = it?.get('travisYaml')?.get('text')?.trim()
-                        }
+                        yaml_text = (it?.get('jervisYaml')?.get('text')?.trim()) ?: it?.get('travisYaml')?.get('text')?.trim()
                     }
 
                     if(!yaml_text) {

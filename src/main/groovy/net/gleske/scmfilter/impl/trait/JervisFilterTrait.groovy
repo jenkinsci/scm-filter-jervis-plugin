@@ -127,7 +127,7 @@ public class JervisFilterTrait extends SCMSourceTrait {
                         return false
                     }
                     def github = new GitHubGraphQL()
-                    github.credential = new GraphQLTokenCredential(source.owner)
+                    github.credential = new GraphQLTokenCredential(source.owner, source.credentialsId)
 
                     // get GitHub GraphQL API endpoint
                     github.gh_api = ((source.apiUri ?: source.GITHUB_URL) -~ '(/v3)?/?$') + '/graphql'

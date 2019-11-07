@@ -8,13 +8,15 @@ import jenkins.model.Jenkins
 import hudson.model.Item
 
 class GraphQLTokenCredential implements ReadonlyTokenCredential {
-    Item owner
-    GraphQLTokenCredential(Item owner) {
+    public final Item owner
+    public final String credentialsId
+    GraphQLTokenCredential(Item owner, String credentialsId) {
         this.owner = owner
+        this.credentialsId = credentialsId
     }
     String getToken() {
-        CredentialsProvider.lookupCredentials(StandardUsernamePasswordCredentials, this.owner, Jenkins.instance.ACL.SYSTEM).find {
-            it.id == source.credentialsId
+        CredentialsProvider.lookupCredentials(StandardUsernamePasswordCredentials, owner, Jenkins.instance.ACL.SYSTEM).find {
+            it.id == credentialsId
         }.with {
             return (it?.password?.plainText) ?: ''
         }

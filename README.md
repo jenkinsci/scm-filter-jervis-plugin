@@ -5,6 +5,23 @@ to deliver software in a self-service manner.
 
 This plugin can also be used for Travis CI YAML.
 
+# How to configure this plugin
+
+1. Configure a multibranch pipeline job or a GitHub organization job.
+2. Select GitHub Branch Source as the SCM type for the repository.
+3. Under behaviors, click the `Add` button and select `Filter by Jervis YAML for
+   branches, pull requests, and tags.`
+
+   ![Screenshot of add Jervis behavior][screenshot-add-jervis]
+
+4. Save or customize the YAML file name.  You can customize the YAML file name
+   to be something other than `.jervis.yml` at the root of the repository.
+
+   ![Screenshot of configuring Jervis behavior][screenshot-configure-jervis]
+
+[screenshot-add-jervis]: https://user-images.githubusercontent.com/875669/68359670-beb37280-00ea-11ea-8b71-1f19e4d926e9.png
+[screenshot-configure-jervis]: https://user-images.githubusercontent.com/875669/68359738-09cd8580-00eb-11ea-9782-c68d218c8b79.png
+
 # Short Introduction
 
 This will look at the root of a GitHub reference for `.jervis.yml` for the

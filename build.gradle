@@ -132,3 +132,9 @@ configurations.all {
         forcedModules = [ 'org.codehaus.groovy:groovy-all:2.4.11' ]
     }
 }
+// do not publish snapshot releases
+gradle.taskGraph.whenReady { graph ->
+    if (graph.hasTask(':publish') && version.endsWith('-SNAPSHOT')) {
+        throw new IllegalStateException('ERROR: Snapshot releases are not allowed.')
+    }
+}

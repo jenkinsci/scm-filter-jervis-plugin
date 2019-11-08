@@ -127,11 +127,10 @@ public class JervisFilterTrait extends SCMSourceTrait {
                         return false
                     }
                     def github = new GitHubGraphQL()
+                    // set credentials for GraphQL API interaction
                     github.credential = new GraphQLTokenCredential(source.owner, source.credentialsId)
-
                     // get GitHub GraphQL API endpoint
                     github.gh_api = ((source.apiUri ?: source.GITHUB_URL) -~ '(/v3)?/?$') + '/graphql'
-                    // set credentials for GraphQL API interaction
 
                     Map binding = [
                         owner: source.repoOwner,
@@ -143,20 +142,23 @@ public class JervisFilterTrait extends SCMSourceTrait {
                         // pull request
                         binding['git_ref'] = "refs/pull/${head.id}/head"
                         target_ref = head.target.name
+                        LOGGER.fine("Scanning pull request ${head.name}.")
                     }
                     else if(head instanceof TagSCMHead) {
                         // tag
                         binding['git_ref'] = "refs/tags/${head.name}"
                         target_ref = head.name
+                        LOGGER.fine("Scanning tag ${head.name}.")
                     }
                     else {
                         // branch
                         binding['git_ref'] = "refs/heads/${head.name}"
                         target_ref = head.name
+                        LOGGER.fine("Scanning branch ${head.name}.")
                     }
 
                     String graphql_query = (new SimpleTemplateEngine()).createTemplate(graphql_expr_template).make(binding)
-                    LOGGER.fine("GraphQL query for ${target_ref}:\n${graphql_query}")
+                    LOGGER.fine("GraphQL query for target ref ${target_ref}:\n${graphql_query}")
                     Map response = github.sendGQL(graphql_query)
                     String yaml_text = ''
                     response?.get('data')?.get('repository').with {

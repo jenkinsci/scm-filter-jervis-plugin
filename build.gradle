@@ -6,7 +6,7 @@ if(JavaVersion.current() != JavaVersion.VERSION_1_8) {
     throw new GradleException("This project requires Java 8, but it's running on "+JavaVersion.current())
 }
 
-group = 'org.jenkins-ci.plugins'
+group = 'io.jenkins.plugins'
 version = version
 description = 'A multibranch SCM filter which searches for Jervis YAML in a GitHub repository for filtering branches, tags, and pull requests.'
 
@@ -24,7 +24,7 @@ repositories {
 
 jenkinsPlugin {
     // version of Jenkins core this plugin depends on, must be 1.420 or later
-    coreVersion = '2.130'
+    coreVersion = '2.138.4'
 
     // ID of the plugin, defaults to the project name without trailing '-plugin'
     shortName = 'scm-filter-jervis'

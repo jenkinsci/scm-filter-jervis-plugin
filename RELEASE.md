@@ -16,6 +16,14 @@ Add credentials to [`~/.jenkins-ci.org`][dot-jenkins].
 - [ ] Update [CHANGELOG.md](CHANGELOG.md) with changes.
 - [ ] Update [CHANGELOG.md](CHANGELOG.md) with release date.
 
+### Testing Locally
+
+To build the plugin `.hpi` file run the following command.
+
+    ./gradlew clean jpi
+
+Upload `build/libs/scm-filter-jervis.hpi` to your test Jenkins instance.
+
 ### Perform Rlease
 
 1. Increment `gradle.properties` version to a stable release: e.g. if version is

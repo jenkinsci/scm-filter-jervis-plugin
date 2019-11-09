@@ -158,7 +158,7 @@ public class JervisFilterTrait extends SCMSourceTrait {
                     }
 
                     String graphql_query = (new SimpleTemplateEngine()).createTemplate(graphql_expr_template).make(binding)
-                    LOGGER.fine("GraphQL query for target ref ${target_ref}:\n${graphql_query}")
+                    LOGGER.finer("GraphQL query for target ref ${target_ref}:\n${graphql_query}")
                     Map response = github.sendGQL(graphql_query)
                     String yaml_text = ''
                     response?.get('data')?.get('repository').with {

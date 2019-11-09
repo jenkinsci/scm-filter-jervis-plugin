@@ -33,7 +33,7 @@ jenkinsPlugin {
     displayName = 'SCM Filter Jervis Plugin'
 
     // URL for plugin on Jenkins wiki or elsewhere
-    url = 'https://github.com/samrocketman/scm-filter-jervis-plugin/blob/master/README.md'
+    url = 'https://github.com/jenkinsci/scm-filter-jervis-plugin'
 
     // plugin URL on GitHub, optional
     gitHubUrl = 'https://github.com/jenkinsci/scm-filter-jervis-plugin'

@@ -1,4 +1,4 @@
-# SCM Filter Jervis YAML 0.2
+# SCM Filter Jervis YAML 0.2 - Nov 10, 2019
 
 - Support falling back to different paths.  Now a user can provide alternate
   YAML paths to search for YAML.  It will try the first path but fall back to

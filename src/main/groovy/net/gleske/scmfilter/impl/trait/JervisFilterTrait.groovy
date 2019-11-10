@@ -23,6 +23,7 @@ package net.gleske.scmfilter.impl.trait;
 
 import net.gleske.jervis.remotes.GitHubGraphQL
 import net.gleske.scmfilter.credential.GraphQLTokenCredential
+import static net.gleske.jervis.tools.AutoRelease.getScriptFromTemplate
 
 import edu.umd.cs.findbugs.annotations.CheckForNull
 import edu.umd.cs.findbugs.annotations.NonNull
@@ -58,9 +59,10 @@ public class JervisFilterTrait extends SCMSourceTrait {
     private static final graphql_expr_template = '''
         |query {
         |    repository(owner: "${owner}", name: "${repository}") {
-        |        jervisYaml:object(expression: "${git_ref}:${yamlFileName}") {
+        |        <% yamlFiles.eachWithIndex { yamlFileName, index -> %>jervisYaml${index}:object(expression: "${git_ref}:${yamlFileName}") {
         |            ...file
         |        }
+        |<% } %>
         |    }
         |}
         |fragment file on GitObject {
@@ -131,11 +133,18 @@ public class JervisFilterTrait extends SCMSourceTrait {
                     github.credential = new GraphQLTokenCredential(source.owner, source.credentialsId)
                     // get GitHub GraphQL API endpoint
                     github.gh_api = ((source.apiUri ?: source.GITHUB_URL) -~ '(/v3)?/?$') + '/graphql'
+                    List yamlFiles = []
+                    if(yamlFileName.contains(',')) {
+                        yamlFiles = yamlFileName.tokenize(',')*.trim()
+                    }
+                    else {
+                        yamlFiles << yamlFileName.trim()
+                    }
 
                     Map binding = [
                         owner: source.repoOwner,
                         repository: source.repository,
-                        yamlFileName: yamlFileName
+                        yamlFiles: yamlFiles
                     ]
                     String target_ref = ''
                     if(head instanceof ChangeRequestSCMHead) {
@@ -157,21 +166,32 @@ public class JervisFilterTrait extends SCMSourceTrait {
                         LOGGER.fine("Scanning branch ${head.name}.")
                     }
 
-                    String graphql_query = (new SimpleTemplateEngine()).createTemplate(graphql_expr_template).make(binding)
+                    String graphql_query = getScriptFromTemplate(graphql_expr_template, binding)
                     LOGGER.finer("GraphQL query for target ref ${target_ref}:\n${graphql_query}")
                     Map response = github.sendGQL(graphql_query)
-                    String yaml_text = ''
-                    response?.get('data')?.get('repository').with {
-                        yaml_text = (it?.get('jervisYaml')?.get('text')?.trim()) ?: it?.get('travisYaml')?.get('text')?.trim()
+                    String yamlText = ''
+                    // try to get all requested yaml files from the comma
+                    // separated paths provided by the admin configuration
+                    String yamlFile = ''
+                    response?.get('data')?.get('repository')?.with { Map repoData ->
+                        for(int i = 0; i < yamlFiles.size(); i++) {
+                            yamlText = (repoData?.get("jervisYaml${i}".toString())?.get('text')?.trim())
+                            if(yamlText) {
+                                yamlFile = yamlFiles[i]
+                                break
+                            }
+                        }
                     }
 
-                    if(!yaml_text) {
+                    if(!yamlText) {
                         // could not find YAML or file was empty so should not build
+                        LOGGER.finer("On target ref ${target_ref}, could not find yaml file(s): ${yamlFileName}")
                         return true
                     }
+                    LOGGER.fine("On target ref ${target_ref}, found ${yamlFile}:\n${['='*80, yamlText, '='*80].join('\n')}\nEND YAML FILE")
 
                     // parse the YAML for filtering
-                    Map jervis_yaml = (new Yaml()).load(yaml_text)
+                    Map jervis_yaml = (new Yaml()).load(yamlText)
                     if(head in TagSCMHead) {
                         // tag
                         if(!('tags' in jervis_yaml)) {

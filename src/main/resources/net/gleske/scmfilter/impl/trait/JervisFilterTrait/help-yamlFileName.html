@@ -20,6 +20,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 -->
 <div>
-  The filename which will be read from GitHub to determine if a Jenkins branch,
-  tag, or pull request should be built.
+  <p>The filename which will be read from GitHub to determine if a Jenkins branch,
+  tag, or pull request should be built.  Provide a comma separated list of
+  paths to YAML files in a repository and it will check each path as a
+  fallback.</p>
+  <p>For example, set the value to: <tt>.jervis.yml, .ci/jervis.yml</tt> and
+  this plugin will first check for valid YAML in <tt>.jervis.yml</tt>.  If no
+  YAML exists, then it will fall back to checking <tt>.ci/jervis.yml</tt>.</p>
 </div>

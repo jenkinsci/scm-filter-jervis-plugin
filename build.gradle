@@ -94,9 +94,10 @@ jenkinsPlugin {
 }
 
 dependencies {
-    compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
-    compile 'net.gleske:jervis:1.5'
-    compile 'org.yaml:snakeyaml:1.25'
+    implementation "org.codehaus.groovy:groovy-all:${groovyVersion}"
+    implementation 'net.gleske:jervis:1.5'
+    implementation 'org.yaml:snakeyaml:1.25'
+
     jenkinsPlugins 'org.jenkins-ci.plugins:credentials:2.1.18'
     jenkinsPlugins 'org.jenkins-ci.plugins:scm-api:2.2.2'
     jenkinsPlugins 'org.jenkins-ci.plugins:github-branch-source:2.5.0'

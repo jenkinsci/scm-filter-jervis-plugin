@@ -1,5 +1,5 @@
 plugins {
-    id 'org.jenkins-ci.jpi' version '0.31.0'
+    id 'org.jenkins-ci.jpi' version '0.36.2'
 }
 
 if(JavaVersion.current() != JavaVersion.VERSION_1_8) {

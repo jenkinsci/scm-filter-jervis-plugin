@@ -2,15 +2,15 @@ plugins {
     id 'org.jenkins-ci.jpi' version '0.31.0'
 }
 
-if(JavaVersion.current() != JavaVersion.VERSION_1_8) {
-    throw new GradleException("This project requires Java 8, but it's running on "+JavaVersion.current())
+if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
+    throw new GradleException("This project requires Java 8, but it's running on " + JavaVersion.current())
 }
 
 group = 'io.jenkins.plugins'
 version = version
 description = 'A multibranch SCM filter which searches for Jervis YAML in a GitHub repository for filtering branches, tags, and pull requests.'
 
-ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.11'
+ext.groovyVersion = System.getenv('GROOVY_VERSION') ?: '2.4.11'
 println "Using Groovy ${groovyVersion}"
 println "Using Gradle ${gradle.gradleVersion}"
 println "Using Java ${org.gradle.internal.jvm.Jvm.current()}"
@@ -121,8 +121,8 @@ wrapper {
     gradleVersion = '5.4.1'
 }
 
-task( console, dependsOn: "classes", type: JavaExec ) {
-    main = "groovy.ui.Console"
+task(console, dependsOn: 'classes', type: JavaExec) {
+    main = 'groovy.ui.Console'
     classpath = sourceSets.main.runtimeClasspath
 }
 

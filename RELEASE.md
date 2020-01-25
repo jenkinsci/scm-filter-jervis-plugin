@@ -24,7 +24,7 @@ To build the plugin `.hpi` file run the following command.
 
 Upload `build/libs/scm-filter-jervis.hpi` to your test Jenkins instance.
 
-### Perform Rlease
+### Perform Release
 
 1. Increment `gradle.properties` version to a stable release: e.g. if version is
    `0.2-SNAPSHOT`, then you should make the release `0.2` since it's the next

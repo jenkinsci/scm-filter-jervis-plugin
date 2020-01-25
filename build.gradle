@@ -1,16 +1,16 @@
 plugins {
-    id 'org.jenkins-ci.jpi' version '0.31.0'
+    id 'org.jenkins-ci.jpi' version '0.36.2'
 }
 
-if(JavaVersion.current() != JavaVersion.VERSION_1_8) {
-    throw new GradleException("This project requires Java 8, but it's running on "+JavaVersion.current())
+if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
+    throw new GradleException("This project requires Java 8, but it's running on " + JavaVersion.current())
 }
 
 group = 'io.jenkins.plugins'
 version = version
 description = 'A multibranch SCM filter which searches for Jervis YAML in a GitHub repository for filtering branches, tags, and pull requests.'
 
-ext.groovyVersion = System.getenv('GROOVY_VERSION')?: '2.4.11'
+ext.groovyVersion = System.getenv('GROOVY_VERSION') ?: '2.4.11'
 println "Using Groovy ${groovyVersion}"
 println "Using Gradle ${gradle.gradleVersion}"
 println "Using Java ${org.gradle.internal.jvm.Jvm.current()}"
@@ -94,20 +94,23 @@ jenkinsPlugin {
 }
 
 dependencies {
-    compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
-    compile 'net.gleske:jervis:1.5'
-    compile 'org.yaml:snakeyaml:1.25'
+    implementation "org.codehaus.groovy:groovy-all:${groovyVersion}"
+    implementation 'net.gleske:jervis:1.5'
+    implementation 'org.yaml:snakeyaml:1.25'
+
     jenkinsPlugins 'org.jenkins-ci.plugins:credentials:2.1.18'
     jenkinsPlugins 'org.jenkins-ci.plugins:scm-api:2.2.2'
     jenkinsPlugins 'org.jenkins-ci.plugins:github-branch-source:2.5.0'
 
-    // only used by ./gradlew server
-    jenkinsPlugins 'org.jenkins-ci.plugins.workflow:workflow-aggregator:2.6'
-    jenkinsPlugins 'org.jenkins-ci.plugins.workflow:workflow-multibranch:2.21'
-    jenkinsPlugins 'org.jenkins-ci.plugins.workflow:workflow-step-api:2.19'
-    jenkinsPlugins 'org.jenkins-ci.plugins:token-macro:2.7'
-    jenkinsPlugins 'org.jenkins-ci.plugins:pipeline-multibranch-defaults:2.0'
-    jenkinsPlugins 'org.jenkins-ci.plugins:basic-branch-build-strategies:1.3.1'
+    jenkinsServer 'org.jenkins-ci.plugins.workflow:workflow-aggregator:2.6'
+    jenkinsServer 'org.jenkins-ci.plugins.workflow:workflow-multibranch:2.21'
+    jenkinsServer 'org.jenkins-ci.plugins.workflow:workflow-step-api:2.19'
+    jenkinsServer 'org.jenkins-ci.plugins:token-macro:2.7'
+    jenkinsServer 'org.jenkins-ci.plugins:pipeline-multibranch-defaults:2.0'
+    jenkinsServer 'org.jenkins-ci.plugins:basic-branch-build-strategies:1.3.1'
+    jenkinsServer 'org.jenkins-ci.plugins:display-url-api:2.3.2'
+    jenkinsServer 'org.jenkins-ci.plugins:jackson2-api:2.9.10'
+    jenkinsServer 'org.jenkins-ci.plugins:matrix-project:1.14'
 }
 
 task cleanJenkins(type: Delete) {
@@ -118,11 +121,11 @@ task cleanJenkins(type: Delete) {
 //http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
 //generate gradlew with: gradle wrapper
 wrapper {
-    gradleVersion = '5.4.1'
+    gradleVersion = '6.0.1'
 }
 
-task( console, dependsOn: "classes", type: JavaExec ) {
-    main = "groovy.ui.Console"
+task(console, dependsOn: 'classes', type: JavaExec) {
+    main = 'groovy.ui.Console'
     classpath = sourceSets.main.runtimeClasspath
 }
 

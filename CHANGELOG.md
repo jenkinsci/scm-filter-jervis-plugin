@@ -1,3 +1,11 @@
+# SCM Filter Jervis YAML 0.2.1 - Jan 27, 2020
+
+- No code changes.
+- Minor release which only changes how the HPI is packaged.  See [PR #4][#4] for
+  details.
+
+[#4]: https://github.com/jenkinsci/scm-filter-jervis-plugin/pull/4
+
 # SCM Filter Jervis YAML 0.2 - Nov 10, 2019
 
 - Support falling back to different paths.  Now a user can provide alternate

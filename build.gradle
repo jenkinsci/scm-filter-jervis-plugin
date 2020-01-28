@@ -88,7 +88,7 @@ jenkinsPlugin {
             name 'MIT License'
             url 'https://github.com/jenkinsci/scm-filter-jervis-plugin/blob/master/LICENSE'
             distribution 'repo'
-            comments 'Copyright 2014-2019 Sam Gleske'
+            comments 'Copyright 2014-2020 Sam Gleske'
         }
     }
 }

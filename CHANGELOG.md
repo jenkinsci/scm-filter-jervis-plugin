@@ -1,3 +1,8 @@
+# SCM Filter Jervis YAML 0.3 - Apr 21, 2020
+
+- Fix for SECURITY-1826, upgrade snakeyaml and jervis dependences. Update Yaml
+  code to parse YAML using `SafeConstructor`.
+
 # SCM Filter Jervis YAML 0.2.1 - Jan 27, 2020
 
 - No code changes.

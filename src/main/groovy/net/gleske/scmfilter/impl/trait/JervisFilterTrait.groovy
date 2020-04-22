@@ -49,6 +49,7 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import java.util.regex.Pattern
 import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.constructor.SafeConstructor
 
 
 public class JervisFilterTrait extends SCMSourceTrait {
@@ -191,7 +192,7 @@ public class JervisFilterTrait extends SCMSourceTrait {
                     LOGGER.fine("On target ref ${target_ref}, found ${yamlFile}:\n${['='*80, yamlText, '='*80].join('\n')}\nEND YAML FILE")
 
                     // parse the YAML for filtering
-                    Map jervis_yaml = (new Yaml()).load(yamlText)
+                    Map jervis_yaml = (new Yaml(new SafeConstructor())).load(yamlText)
                     if(head in TagSCMHead) {
                         // tag
                         if(!('tags' in jervis_yaml)) {

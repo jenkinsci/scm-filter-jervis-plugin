@@ -5,10 +5,7 @@ Jenkins plugin registry.
 
 ### Prerequisites
 
-Add credentials to [`~/.jenkins-ci.org`][dot-jenkins].
-
-    userName=user
-    password=mypassword
+Install Maven 3.8.8 or higher.
 
 ### Prepare for release checklist
 
@@ -20,15 +17,12 @@ Add credentials to [`~/.jenkins-ci.org`][dot-jenkins].
 
 To build the plugin `.hpi` file run the following command.
 
-    ./gradlew clean jpi
+    mvn clean package
 
-Upload `build/libs/scm-filter-jervis.hpi` to your test Jenkins instance.
+Upload `target/scm-filter-jervis.hpi` to your test Jenkins instance.
 
 ### Perform Release
 
-1. Increment `gradle.properties` version to a stable release: e.g. if version is
-   `0.2-SNAPSHOT`, then you should make the release `0.2` since it's the next
-   release.  Commit.
-2. Run `./gradlew clean publish`
+Releases are now [automatically handled][auto-release] by the Jenkins org.
 
-[dot-jenkins]: https://wiki.jenkins-ci.org/display/JENKINS/Dot+Jenkins+Ci+Dot+Org
+[auto-release]: https://www.jenkins.io/doc/developer/publishing/releasing-cd/

@@ -1,0 +1,5 @@
+<?jelly escape-by-default='true'?>
+<div>
+    A multibranch SCM filter which searches for Jervis YAML in a GitHub
+    repository for filtering branches, tags, and pull requests.
+</div>

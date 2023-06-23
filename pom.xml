@@ -14,7 +14,6 @@
   <packaging>hpi</packaging>
 
   <name>SCM Filter Jervis Plugin</name>
-  <url>https://github.com/jenkinsci/scm-filter-jervis-plugin</url>
   <licenses>
     <license>
       <name>MIT License</name>

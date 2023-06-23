@@ -1,160 +1,154 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>plugin</artifactId>
-        <version>4.66</version>
-        <relativePath />
-    </parent>
+  <parent>
+    <groupId>org.jenkins-ci.plugins</groupId>
+    <artifactId>plugin</artifactId>
+    <version>4.66</version>
+    <relativePath />
+  </parent>
 
-    <properties>
-        <revision>1.7</revision>
-        <changelist>999999-SNAPSHOT</changelist>
-        <gitHubRepo>jenkinsci/scm-filter-jervis-plugin</gitHubRepo>
-        <jenkins.version>2.387.3</jenkins.version>
-        <!-- TODO fix violations -->
-        <spotbugs.threshold>High</spotbugs.threshold>
-        <spotless.check.skip>false</spotless.check.skip>
-    </properties>
+  <artifactId>scm-filter-jervis</artifactId>
+  <version>${revision}-${changelist}</version>
+  <packaging>hpi</packaging>
 
-    <artifactId>scm-filter-jervis</artifactId>
-    <version>${revision}-${changelist}</version>
-    <packaging>hpi</packaging>
+  <name>SCM Filter Jervis Plugin</name>
+  <url>https://github.com/jenkinsci/scm-filter-jervis-plugin</url>
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>http://opensource.org/licenses/MIT</url>
+    </license>
+  </licenses>
 
-    <name>SCM Filter Jervis Plugin</name>
-    <url>https://github.com/jenkinsci/scm-filter-jervis-plugin</url>
-    <licenses>
-        <license>
-            <name>MIT License</name>
-            <url>http://opensource.org/licenses/MIT</url>
-        </license>
-    </licenses>
+  <developers>
+    <developer>
+      <id>sag47</id>
+      <name>Sam Gleske</name>
+    </developer>
+  </developers>
 
-    <developers>
-        <developer>
-            <id>sag47</id>
-            <name>Sam Gleske</name>
-        </developer>
-    </developers>
+  <scm>
+    <connection>scm:git:https://github.com/${gitHubRepo}.git</connection>
+    <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
+    <tag>${scmTag}</tag>
+    <url>https://github.com/${gitHubRepo}</url>
+  </scm>
 
-    <scm>
-        <connection>scm:git:https://github.com/${gitHubRepo}.git</connection>
-        <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
-        <url>https://github.com/${gitHubRepo}</url>
-        <tag>${scmTag}</tag>
-    </scm>
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-2.387.x</artifactId>
-                <version>2163.v2d916d90c305</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+  <properties>
+    <revision>1.7</revision>
+    <changelist>999999-SNAPSHOT</changelist>
+    <gitHubRepo>jenkinsci/scm-filter-jervis-plugin</gitHubRepo>
+    <jenkins.version>2.387.3</jenkins.version>
+    <!-- TODO fix violations -->
+    <spotbugs.threshold>High</spotbugs.threshold>
+    <spotless.check.skip>false</spotless.check.skip>
+  </properties>
+  <dependencyManagement>
     <dependencies>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>credentials</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>github-branch-source</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>scm-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.jenkins.plugins</groupId>
-            <artifactId>snakeyaml-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.gleske</groupId>
-            <artifactId>jervis</artifactId>
-            <version>${revision}</version>
-            <!-- No transitive dependencies -->
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+      <dependency>
+        <groupId>io.jenkins.tools.bom</groupId>
+        <artifactId>bom-2.387.x</artifactId>
+        <version>2163.v2d916d90c305</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
     </dependencies>
+  </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>snakeyaml-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.gleske</groupId>
+      <artifactId>jervis</artifactId>
+      <version>${revision}</version>
+      <!-- No transitive dependencies -->
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>credentials</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>github-branch-source</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>scm-api</artifactId>
+    </dependency>
+  </dependencies>
 
-    <!--
+  <repositories>
+    <repository>
+      <id>repo.jenkins-ci.org</id>
+      <url>https://repo.jenkins-ci.org/public/</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>repo.jenkins-ci.org</id>
+      <url>https://repo.jenkins-ci.org/public/</url>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <!--
         Compile groovy code
         https://docs.groovy-lang.org/latest/html/documentation/tools-groovyc.html
     -->
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>compile</id>
-                        <phase>compile</phase>
-                        <configuration>
-                            <target>
-                                <mkdir dir="${basedir}/src/main/groovy"/>
-                                <taskdef name="groovyc"
-                                    classname="org.codehaus.groovy.ant.Groovyc">
-                                    <classpath refid="maven.compile.classpath"/>
-                                </taskdef>
-                                <mkdir dir="${project.build.outputDirectory}"/>
-                                <groovyc destdir="${project.build.outputDirectory}"
-                                    srcdir="${basedir}/src/main/groovy/" listfiles="true">
-                                    <classpath refid="maven.compile.classpath"/>
-                                </groovyc>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <phase>test-compile</phase>
-                        <configuration>
-                            <target>
-                                <mkdir dir="${basedir}/src/test/groovy"/>
-                                <taskdef name="groovyc"
-                                    classname="org.codehaus.groovy.ant.Groovyc">
-                                    <classpath refid="maven.test.classpath"/>
-                                </taskdef>
-                                <mkdir dir="${project.build.testOutputDirectory}"/>
-                                <groovyc destdir="${project.build.testOutputDirectory}"
-                                    srcdir="${basedir}/src/test/groovy/" listfiles="true">
-                                    <classpath refid="maven.test.classpath"/>
-                                </groovyc>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
-    <repositories>
-        <repository>
-            <id>repo.jenkins-ci.org</id>
-            <url>https://repo.jenkins-ci.org/public/</url>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>repo.jenkins-ci.org</id>
-            <url>https://repo.jenkins-ci.org/public/</url>
-        </pluginRepository>
-    </pluginRepositories>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>compile</id>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <phase>compile</phase>
+            <configuration>
+              <target>
+                <mkdir dir="${basedir}/src/main/groovy" />
+                <taskdef classname="org.codehaus.groovy.ant.Groovyc" name="groovyc">
+                  <classpath refid="maven.compile.classpath" />
+                </taskdef>
+                <mkdir dir="${project.build.outputDirectory}" />
+                <groovyc destdir="${project.build.outputDirectory}" listfiles="true" srcdir="${basedir}/src/main/groovy/">
+                  <classpath refid="maven.compile.classpath" />
+                </groovyc>
+              </target>
+            </configuration>
+          </execution>
+          <execution>
+            <id>test-compile</id>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <phase>test-compile</phase>
+            <configuration>
+              <target>
+                <mkdir dir="${basedir}/src/test/groovy" />
+                <taskdef classname="org.codehaus.groovy.ant.Groovyc" name="groovyc">
+                  <classpath refid="maven.test.classpath" />
+                </taskdef>
+                <mkdir dir="${project.build.testOutputDirectory}" />
+                <groovyc destdir="${project.build.testOutputDirectory}" listfiles="true" srcdir="${basedir}/src/test/groovy/">
+                  <classpath refid="maven.test.classpath" />
+                </groovyc>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

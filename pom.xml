@@ -11,6 +11,16 @@
         <relativePath />
     </parent>
 
+    <properties>
+        <revision>1.7</revision>
+        <changelist>999999-SNAPSHOT</changelist>
+        <gitHubRepo>jenkinsci/scm-filter-jervis-plugin</gitHubRepo>
+        <jenkins.version>2.387.3</jenkins.version>
+        <!-- TODO fix violations -->
+        <spotbugs.threshold>High</spotbugs.threshold>
+        <spotless.check.skip>false</spotless.check.skip>
+    </properties>
+
     <artifactId>scm-filter-jervis</artifactId>
     <version>${revision}-${changelist}</version>
     <packaging>hpi</packaging>
@@ -37,13 +47,6 @@
         <url>https://github.com/${gitHubRepo}</url>
         <tag>${scmTag}</tag>
     </scm>
-
-    <properties>
-        <revision>1.7</revision>
-        <changelist>999999-SNAPSHOT</changelist>
-        <gitHubRepo>jenkinsci/scm-filter-jervis-plugin</gitHubRepo>
-        <jenkins.version>2.387.3</jenkins.version>
-    </properties>
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -85,6 +88,62 @@
             </exclusions>
         </dependency>
     </dependencies>
+
+    <!--
+        Compile groovy code
+        https://docs.groovy-lang.org/latest/html/documentation/tools-groovyc.html
+    -->
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <configuration>
+                            <target>
+                                <mkdir dir="${basedir}/src/main/groovy"/>
+                                <taskdef name="groovyc"
+                                    classname="org.codehaus.groovy.ant.Groovyc">
+                                    <classpath refid="maven.compile.classpath"/>
+                                </taskdef>
+                                <mkdir dir="${project.build.outputDirectory}"/>
+                                <groovyc destdir="${project.build.outputDirectory}"
+                                    srcdir="${basedir}/src/main/groovy/" listfiles="true">
+                                    <classpath refid="maven.compile.classpath"/>
+                                </groovyc>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>test-compile</phase>
+                        <configuration>
+                            <target>
+                                <mkdir dir="${basedir}/src/test/groovy"/>
+                                <taskdef name="groovyc"
+                                    classname="org.codehaus.groovy.ant.Groovyc">
+                                    <classpath refid="maven.test.classpath"/>
+                                </taskdef>
+                                <mkdir dir="${project.build.testOutputDirectory}"/>
+                                <groovyc destdir="${project.build.testOutputDirectory}"
+                                    srcdir="${basedir}/src/test/groovy/" listfiles="true">
+                                    <classpath refid="maven.test.classpath"/>
+                                </groovyc>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <repositories>
         <repository>

@@ -29,6 +29,7 @@ import jenkins.model.Jenkins
 import hudson.model.Item
 
 class GraphQLTokenCredential implements ReadonlyTokenCredential {
+    private static final long serialVersionUID = 1L
     public final Item owner
     public final String credentialsId
     GraphQLTokenCredential(Item owner, String credentialsId) {

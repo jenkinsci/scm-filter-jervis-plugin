@@ -54,6 +54,7 @@ import org.yaml.snakeyaml.constructor.SafeConstructor
 
 public class JervisFilterTrait extends SCMSourceTrait {
 
+    private static final long serialVersionUID = 1L
     // logger
     private transient static final Logger LOGGER = Logger.getLogger(JervisFilterTrait.name)
     private static final DEFAULT_YAML_FILE = '.jervis.yml'

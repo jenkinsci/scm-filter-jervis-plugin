@@ -34,7 +34,7 @@ SOFTWARE.
   <code><pre>
 branches:
   only:
-    - master
+    - main
 </pre></code>
 
   <h1>More on specify branches and tags to build</h1>
@@ -44,54 +44,54 @@ branches:
   specifying the <tt>branches</tt> or <tt>tags</tt> key in your
   <tt>.jervis.yml</tt>.</p>
 
-  <h3>Whitelist or blacklist branches and tags</h3>
+  <h3>Allow or block branches and tags</h3>
 
-  <p>You can either whitelist or blacklist branches that you want to be
-  built:</p>
+  <p>You can either create an allow list of branches (only) or a block list of
+  branches (except) to be built.</p>
 
   <code><pre>
-# blacklist
+# block branches from building
 branches:
   except:
     - legacy
     - experimental
 
-# whitelist
+# allow only these branches
 branches:
   only:
-    - master
+    - main
     - stable
 </pre></code>
 
   <p>The same YAML can be applied to tags.</p>
 
   <code><pre>
-# blacklist
+# block tags from building
 tags:
   except:
     - .*-rc
     - .*-beta
 
-# whitelist
+# allow only these tags
 tags:
   only:
     - v[.0-9]+
 </pre></code>
 
   <p>If you specify both <tt>only</tt> and <tt>except</tt>, then
-  <tt>except</tt> will be ignored.  <tt>.jervis.yml</tt> needs to be
-  present on all branches you want to be built.  <tt>.jervis.yml</tt> will be
-  interpreted in the context of that branch so if you specify a whitelist in
-  your master branch it will not propagate to other branches.</p>
+  <tt>except</tt> will be ignored.  <tt>.jervis.yml</tt> needs to be present on
+  all branches you want to be built.  <tt>.jervis.yml</tt> will be interpreted
+  in the context of that branch so if you specify an allow list in your main
+  branch, then it will not propagate to other branches.</p>
 
   <h3>Using regular expressions</h3>
 
-  <p>You can use regular expressions to whitelist or blacklist branches:</p>
+  <p>You can use regular expressions to allow or block branches:</p>
 
   <code><pre>
 branches:
   only:
-    - master
+    - main
     - /^[.0-9]+-hotfix$/
 </pre></code>
 

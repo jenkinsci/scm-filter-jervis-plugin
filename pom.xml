@@ -68,6 +68,13 @@
             <groupId>net.gleske</groupId>
             <artifactId>jervis</artifactId>
             <version>${revision}</version>
+            <!-- No transitive dependencies -->
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 

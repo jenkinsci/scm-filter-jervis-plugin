@@ -67,6 +67,13 @@
       </exclusions>
     </dependency>
     <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+      <version>2.4.21</version>
+      <type>pom</type>
+      <!-- required JUST since Groovy 2.5.0 -->
+    </dependency>
+    <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>bouncycastle-api</artifactId>
     </dependency>
@@ -119,7 +126,7 @@
                   <classpath refid="maven.compile.classpath" />
                 </taskdef>
                 <mkdir dir="${project.build.outputDirectory}" />
-                <groovyc destdir="${project.build.outputDirectory}" listfiles="true" srcdir="${basedir}/src/main/groovy/">
+                <groovyc destdir="${project.build.outputDirectory}" listfiles="true" srcdir="${basedir}/src/main/groovy/" targetBytecode="11">
                   <classpath refid="maven.compile.classpath" />
                 </groovyc>
               </target>
@@ -138,7 +145,7 @@
                   <classpath refid="maven.test.classpath" />
                 </taskdef>
                 <mkdir dir="${project.build.testOutputDirectory}" />
-                <groovyc destdir="${project.build.testOutputDirectory}" listfiles="true" srcdir="${basedir}/src/test/groovy/">
+                <groovyc destdir="${project.build.testOutputDirectory}" listfiles="true" srcdir="${basedir}/src/test/groovy/" targetBytecode="11">
                   <classpath refid="maven.test.classpath" />
                 </groovyc>
               </target>

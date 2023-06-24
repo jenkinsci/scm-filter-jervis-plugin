@@ -20,8 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 -->
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
-  <f:entry title="${%YAML File Name}" field="yamlFileName">
-    <f:textbox default=".jervis.yml"/>
-  </f:entry>
-</j:jelly>
+<div>
+    A multibranch SCM filter which searches for Jervis YAML in a GitHub
+    repository for filtering branches, tags, and pull requests.
+</div>

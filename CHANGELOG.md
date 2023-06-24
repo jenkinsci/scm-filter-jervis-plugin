@@ -1,3 +1,11 @@
+# SCM Filter Jervis YAML 1.7-continuous Jun 22, 2023
+
+- Convert to maven from gradle.
+- Still using Jervis 1.7 for the time being.
+- Integrate [automated plugin release][auto-release]
+
+[auto-release]: https://www.jenkins.io/doc/developer/publishing/releasing-cd/
+
 # SCM Filter Jervis YAML 0.3 - Apr 21, 2020
 
 - Fix for SECURITY-1826, upgrade snakeyaml and jervis dependences. Update Yaml

@@ -42,7 +42,7 @@ For Branches:
 ```yaml
 branches:
   only:
-    - master
+    - main
 ```
 
 # More on specify branches and tags to build
@@ -51,34 +51,35 @@ By default Jervis will generate Jenkins jobs for all branches that have a
 `.jervis.yml` file.  You can control and limit this behavior by specifying the
 `branches` or `tags` key in your `.jervis.yml`.
 
-### Whitelist or blacklist branches and tags
+### Allow or block branches and tags
 
-You can either whitelist or blacklist branches that you want to be built:
+You can either create an allow list of branches (only) or a block list of
+branches (except) to be built.
 
 ```yaml
-# blacklist
+# block branches from building
 branches:
   except:
     - legacy
     - experimental
 
-# whitelist
+# allow only these branches
 branches:
   only:
-    - master
+    - main
     - stable
 ```
 
 The same YAML can be applied to tags.
 
 ```yaml
-# blacklist
+# block tags from building
 tags:
   except:
     - /.*-rc/
     - /.*-beta/
 
-# whitelist
+# allow only these tags
 tags:
   only:
     - /v[.0-9]+/
@@ -87,17 +88,17 @@ tags:
 If you specify both `only` and `except`, then `except` will be ignored.
 `.jervis.yml` needs to be present on all branches you want to be built.
 `.jervis.yml` will be interpreted in the context of that branch so if you
-specify a whitelist in your master branch it will not propagate to other
+specify an allow list in your main branch, then it will not propagate to other
 branches.
 
 ### Using regular expressions
 
-You can use regular expressions to whitelist or blacklist branches:
+You can use regular expressions to allow or block branches:
 
 ```yaml
 branches:
   only:
-    - master
+    - main
     - /^[.0-9]+-hotfix$/
 ```
 

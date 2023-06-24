@@ -1,5 +1,5 @@
 /*
-    Copyright 2014-2020 Sam Gleske
+    Copyright 2014-2023 Sam Gleske
 
     Permission is hereby granted, free of charge, to any person obtaining a
     copy of this software and associated documentation files (the "Software"),
@@ -54,6 +54,7 @@ import org.yaml.snakeyaml.constructor.SafeConstructor
 
 public class JervisFilterTrait extends SCMSourceTrait {
 
+    private static final long serialVersionUID = 1L
     // logger
     private transient static final Logger LOGGER = Logger.getLogger(JervisFilterTrait.name)
     private static final DEFAULT_YAML_FILE = '.jervis.yml'

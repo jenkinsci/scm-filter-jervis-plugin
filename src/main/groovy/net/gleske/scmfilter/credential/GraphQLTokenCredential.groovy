@@ -1,5 +1,5 @@
 /*
-    Copyright 2014-2020 Sam Gleske
+    Copyright 2014-2023 Sam Gleske
 
     Permission is hereby granted, free of charge, to any person obtaining a
     copy of this software and associated documentation files (the "Software"),
@@ -29,6 +29,7 @@ import jenkins.model.Jenkins
 import hudson.model.Item
 
 class GraphQLTokenCredential implements ReadonlyTokenCredential {
+    private static final long serialVersionUID = 1L
     public final Item owner
     public final String credentialsId
     GraphQLTokenCredential(Item owner, String credentialsId) {

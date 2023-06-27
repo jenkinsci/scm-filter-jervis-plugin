@@ -21,9 +21,10 @@
  */
 package net.gleske.scmfilter.impl.trait;
 
-import net.gleske.jervis.remotes.GitHubGraphQL
-import net.gleske.scmfilter.credential.GraphQLTokenCredential
 import static net.gleske.jervis.tools.AutoRelease.getScriptFromTemplate
+import net.gleske.jervis.remotes.GitHubGraphQL
+import net.gleske.jervis.tools.YamlOperator
+import net.gleske.scmfilter.credential.GraphQLTokenCredential
 
 import edu.umd.cs.findbugs.annotations.CheckForNull
 import edu.umd.cs.findbugs.annotations.NonNull
@@ -48,8 +49,6 @@ import groovy.text.SimpleTemplateEngine
 import java.util.logging.Level
 import java.util.logging.Logger
 import java.util.regex.Pattern
-import org.yaml.snakeyaml.Yaml
-import org.yaml.snakeyaml.constructor.SafeConstructor
 
 
 public class JervisFilterTrait extends SCMSourceTrait {
@@ -193,7 +192,7 @@ public class JervisFilterTrait extends SCMSourceTrait {
                     LOGGER.fine("On target ref ${target_ref}, found ${yamlFile}:\n${['='*80, yamlText, '='*80].join('\n')}\nEND YAML FILE")
 
                     // parse the YAML for filtering
-                    Map jervis_yaml = (new Yaml(new SafeConstructor())).load(yamlText)
+                    Map jervis_yaml = YamlOperator.loadYamlFrom(yamlText)
                     if(head in TagSCMHead) {
                         // tag
                         if(!('tags' in jervis_yaml)) {

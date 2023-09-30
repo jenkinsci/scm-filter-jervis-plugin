@@ -19,9 +19,11 @@
     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
     DEALINGS IN THE SOFTWARE.
  */
-package net.gleske.scmfilter.impl.trait;
+package net.gleske.scmfilter.impl.trait
 
+import static net.gleske.jervis.remotes.SimpleRestService.objToJson
 import static net.gleske.jervis.tools.AutoRelease.getScriptFromTemplate
+import static net.gleske.jervis.tools.SecurityIO.sha256Sum
 import net.gleske.jervis.remotes.GitHubGraphQL
 import net.gleske.jervis.tools.YamlOperator
 import net.gleske.scmfilter.credential.GraphQLTokenCredential
@@ -45,12 +47,36 @@ import org.jenkinsci.Symbol
 import org.jenkinsci.plugins.github_branch_source.GitHubSCMSource
 import org.kohsuke.stapler.DataBoundConstructor
 
-import groovy.text.SimpleTemplateEngine
-import java.util.logging.Level
+import java.time.Instant
+import java.util.concurrent.ThreadLocalRandom
 import java.util.logging.Logger
 import java.util.regex.Pattern
 
+/**
+  This trait is responsible for determining if a branch, PR, or Tag is
+  buildable in a MultiBranch pipeline.
 
+  This class has tunable properties for making network requests to GitHub.  It
+  will introduce a random delay (min 1000ms to max 3000ms) between retrying.
+  By default it will retry GitHub API requests up to 60 times.  Time-wise
+  retrying can take anywhere from 1-3 minutes based on the randomness before
+  this class gives up raising an exception.
+
+  To change minimum range of random delay, start Jenkins with the following
+  property.  Value is an Integer (milliseconds).
+
+    -Dnet.gleske.scmfilter.impl.trait.JervisFilterTrait.minRetryInterval=1000
+
+  To change maximum range of random delay, start Jenkins with the following
+  property.  Value is an Integer (milliseconds).
+
+    -Dnet.gleske.scmfilter.impl.trait.JervisFilterTrait.maxRetryInterval=3000
+
+  To change the amount of times retry is attempted, start Jenkins with the
+  following property.  Value is an Integer (count of retrying).
+
+    -Dnet.gleske.scmfilter.impl.trait.JervisFilterTrait.retryLimit=60
+  */
 public class JervisFilterTrait extends SCMSourceTrait {
 
     private static final long serialVersionUID = 1L
@@ -75,6 +101,87 @@ public class JervisFilterTrait extends SCMSourceTrait {
 
     @NonNull
     private final String yamlFileName
+
+    /**
+      Get .jervis.yml file from GitHub retrying with a random delay if GitHub
+      request fails.
+
+      @param options Instead of parameters you pass parameters by name. [client, query, yamlFiles, log_trace_id]
+      @return A response from GitHub with .jervis.yml with keys [yamlFile, yamlText].  Key-values can be Strings, empty string or null.
+      */
+    private Map getYamlWithRetry(Map options) throws Exception {
+        // method options
+        GitHubGraphQL github = options.client
+        String query = options.query
+        List yamlFiles = options.yamlFiles
+        String log_trace_id = options.log_trace_id
+
+        // system properties
+        Integer minInterval = Integer.getInteger(JervisFilterTrait.name + ".minRetryInterval", 1000)
+        Integer maxInterval = Integer.getInteger(JervisFilterTrait.name + ".maxRetryInterval", 3000) + 1
+        Integer retryLimit = Integer.getInteger(JervisFilterTrait.name + ".retryLimit", 30)
+
+        // internal values
+        List errors = []
+        String yamlText = ''
+        String yamlFile = ''
+        Integer retryCount = 0
+        Map response = [:]
+        while({->
+            if(retryCount > 0) {
+                LOGGER.finer("(trace-${log_trace_id}) Retrying GraphQL after failure (retryCount ${retryCount})")
+            }
+            if(retryCount > retryLimit && errors) {
+                LOGGER.finer("(trace-${log_trace_id}) Retry limit reached with GQL errors ${objToJson(errors: errors)}")
+                throw new Exception("(trace-${log_trace_id}) Retry limit reached with GQL errors ${objToJson(errors: errors)}")
+            } else {
+                errors = []
+            }
+            try {
+                response = github.sendGQL(query)
+            } catch(Exception httpError) {
+                if(retryCount > retryLimit) {
+                    LOGGER.finer("(trace-${log_trace_id}) GraphQL HTTP Error: ${httpError.getMessage()}")
+                    throw httpError
+                }
+                // random delay for sleep
+                sleep(ThreadLocalRandom.current().nextLong(minInterval, maxInterval))
+                retryCount++
+                // retry while loop
+                return true
+            }
+
+            // look for GQL errors
+            if('errors' in response.keySet()) {
+                errors = response.errors
+                // random delay for sleep
+                sleep(ThreadLocalRandom.current().nextLong(minInterval, maxInterval))
+                retryCount++
+                // retry while loop
+                return true
+            }
+
+            // get data from response
+            response?.data?.repository?.with { Map repoData ->
+                yamlFiles.eachWithIndex { yamlFileEntry, i ->
+                    if(yamlText) {
+                        // exit eachWithIndex loop
+                        return
+                    }
+                    yamlText = (repoData?.get("jervisYaml${i}".toString())?.text?.trim())
+                    if(yamlText) {
+                        yamlFile = yamlFiles[i]
+                    }
+                }
+            }
+            // exit the do-while loop
+            return false
+        }()) continue
+
+        // return Map
+        [yamlFile: yamlFile, yamlText: yamlText]
+    }
+
     /**
       Returns the YAML file name to search for filters.
 
@@ -86,10 +193,10 @@ public class JervisFilterTrait extends SCMSourceTrait {
 
     @DataBoundConstructor
     JervisFilterTrait(@CheckForNull String yamlFileName) {
-        this.yamlFileName = StringUtils.defaultIfBlank(yamlFileName, DEFAULT_YAML_FILE);
+        this.yamlFileName = StringUtils.defaultIfBlank(yamlFileName, DEFAULT_YAML_FILE)
     }
 
-    private static shouldExclude(def filters_obj, String target_ref) {
+    private static shouldExclude(def filters_obj, String target_ref, String log_trace_id) {
         List filters = []
         String filter_type = 'only'
         if(filters_obj instanceof List) {
@@ -105,7 +212,7 @@ public class JervisFilterTrait extends SCMSourceTrait {
             }
         }
         if(!filters) {
-            LOGGER.fine("Malformed filter found on git reference ${target_ref} so we will allow by default")
+            LOGGER.fine("(trace-${log_trace_id}) Malformed filter found on git reference ${target_ref} so we will allow by default")
             return false
         }
         String regex = filters.collect {
@@ -129,6 +236,13 @@ public class JervisFilterTrait extends SCMSourceTrait {
                         // wrong type of SCM source so skipping without excluding
                         return false
                     }
+                    // ISO-8601 instant timestamp which provides uniqueness
+                    // http://www.iso.org/iso/home/standards/iso8601.htm
+                    String log_trace_timestamp = Instant.now().toString()
+                    String trace_target = (head in ChangeRequestSCMHead) ? head.target.name : head.name
+                    // Unique trace ID so that associated log messages can be
+                    // followed in Jenkins debug logs
+                    String log_trace_id = sha256Sum(log_trace_timestamp + source.repoOwner + source.repository + trace_target)
                     def github = new GitHubGraphQL()
                     // set credentials for GraphQL API interaction
                     github.credential = new GraphQLTokenCredential(source.owner, source.credentialsId)
@@ -152,44 +266,35 @@ public class JervisFilterTrait extends SCMSourceTrait {
                         // pull request
                         binding['git_ref'] = "refs/pull/${head.id}/head"
                         target_ref = head.target.name
-                        LOGGER.fine("Scanning pull request ${head.name}.")
+                        LOGGER.fine("(trace-${log_trace_id}) Scanning pull request ${head.name}.")
                     }
                     else if(head instanceof TagSCMHead) {
                         // tag
                         binding['git_ref'] = "refs/tags/${head.name}"
                         target_ref = head.name
-                        LOGGER.fine("Scanning tag ${head.name}.")
+                        LOGGER.fine("(trace-${log_trace_id}) Scanning tag ${head.name}.")
                     }
                     else {
                         // branch
                         binding['git_ref'] = "refs/heads/${head.name}"
                         target_ref = head.name
-                        LOGGER.fine("Scanning branch ${head.name}.")
+                        LOGGER.fine("(trace-${log_trace_id}) Scanning branch ${head.name}.")
                     }
 
                     String graphql_query = getScriptFromTemplate(graphql_expr_template, binding)
-                    LOGGER.finer("GraphQL query for target ref ${target_ref}:\n${graphql_query}")
-                    Map response = github.sendGQL(graphql_query)
-                    String yamlText = ''
+                    LOGGER.finer("(trace-${log_trace_id}) GraphQL query for target ref ${target_ref}:\n${graphql_query}")
                     // try to get all requested yaml files from the comma
                     // separated paths provided by the admin configuration
-                    String yamlFile = ''
-                    response?.get('data')?.get('repository')?.with { Map repoData ->
-                        for(int i = 0; i < yamlFiles.size(); i++) {
-                            yamlText = (repoData?.get("jervisYaml${i}".toString())?.get('text')?.trim())
-                            if(yamlText) {
-                                yamlFile = yamlFiles[i]
-                                break
-                            }
-                        }
-                    }
+                    Map response = getYamlWithRetry(client: github, query: graphql_query, yamlFiles: yamlFiles, log_trace_id: log_trace_id)
+                    String yamlFile = response.yamlFile ?: ''
+                    String yamlText = response.yamlText ?: ''
 
                     if(!yamlText) {
                         // could not find YAML or file was empty so should not build
-                        LOGGER.finer("On target ref ${target_ref}, could not find yaml file(s): ${yamlFileName}")
+                        LOGGER.finer("(trace-${log_trace_id}) On target ref ${target_ref}, could not find yaml file(s): ${yamlFileName}")
                         return true
                     }
-                    LOGGER.fine("On target ref ${target_ref}, found ${yamlFile}:\n${['='*80, yamlText, '='*80].join('\n')}\nEND YAML FILE")
+                    LOGGER.fine("(trace-${log_trace_id}) On target ref ${target_ref}, found ${yamlFile}:\n${['='*80, yamlText, '='*80].join('\n')}\nEND YAML FILE")
 
                     // parse the YAML for filtering
                     Map jervis_yaml = YamlOperator.loadYamlFrom(yamlText)
@@ -199,7 +304,7 @@ public class JervisFilterTrait extends SCMSourceTrait {
                             // allow all by default
                             return false
                         }
-                        return shouldExclude(jervis_yaml['tags'], target_ref)
+                        return shouldExclude(jervis_yaml['tags'], target_ref, log_trace_id)
                     }
                     else {
                         // branch or pull request
@@ -207,7 +312,7 @@ public class JervisFilterTrait extends SCMSourceTrait {
                             // allow all by default
                             return false
                         }
-                        return shouldExclude(jervis_yaml['branches'], target_ref)
+                        return shouldExclude(jervis_yaml['branches'], target_ref, log_trace_id)
                     }
                 }
             })

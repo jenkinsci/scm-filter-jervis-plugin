@@ -26,17 +26,18 @@ import edu.umd.cs.findbugs.annotations.CheckForNull
 import edu.umd.cs.findbugs.annotations.NonNull
 import hudson.Extension
 import jenkins.model.Jenkins
-import jenkins.scm.api.SCMHead
+import jenkins.plugins.git.AbstractGitSCMSource
 import jenkins.scm.api.mixin.ChangeRequestSCMHead
 import jenkins.scm.api.mixin.TagSCMHead
+import jenkins.scm.api.SCMHead
+import jenkins.scm.api.SCMSource
 import jenkins.scm.api.trait.SCMHeadPrefilter
 import jenkins.scm.api.trait.SCMSourceContext
 import jenkins.scm.api.trait.SCMSourceTrait
 import jenkins.scm.api.trait.SCMSourceTraitDescriptor
 import jenkins.scm.impl.trait.Selection
-import org.jenkinsci.Symbol
-import jenkins.plugins.git.AbstractGitSCMSource
 import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject
+import org.jenkinsci.Symbol
 import org.kohsuke.stapler.DataBoundConstructor
 
 // Java imports

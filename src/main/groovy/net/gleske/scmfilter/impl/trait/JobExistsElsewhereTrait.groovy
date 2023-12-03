@@ -28,7 +28,6 @@ import hudson.Extension
 import jenkins.model.Jenkins
 import jenkins.plugins.git.AbstractGitSCMSource
 import jenkins.scm.api.mixin.ChangeRequestSCMHead
-import jenkins.scm.api.mixin.TagSCMHead
 import jenkins.scm.api.SCMHead
 import jenkins.scm.api.SCMSource
 import jenkins.scm.api.trait.SCMHeadPrefilter
@@ -114,7 +113,7 @@ public class JobExistsElsewhereTrait extends SCMSourceTrait {
         this.timeToSearch
     }
 
-    private Boolean isIncluded(String filter, String fullName) {
+    private Boolean isIncluded(String filter, String fullName, String log_trace_id) {
         if(!filter) {
             return true
         }
@@ -122,7 +121,7 @@ public class JobExistsElsewhereTrait extends SCMSourceTrait {
             return fullName.startsWith(filter)
         }
         // pattern search; in this case "except" returns true if there's a match
-        JervisFilterTrait.shouldExclude([except: [filter]], fullName, 'JobExistsElsewhereTrait')
+        JervisFilterTrait.shouldExclude([except: [filter]], fullName, log_trace_id)
     }
 
     @Override
@@ -134,11 +133,14 @@ public class JobExistsElsewhereTrait extends SCMSourceTrait {
                         // wrong type of SCM source so skipping and excluding
                         return true
                     }
+                    String log_trace_timestamp = Instant.now().toString()
+                    String trace_target = head.name
                     String remote = source.getRemote()
+                    String log_trace_id = sha256Sum(log_trace_timestamp + remote + trace_target)
                     List matchedParentJobs = Jenkins.instance.getAllItems(WorkflowMultiBranchProject).findAll { job ->
-                        Boolean includeJob = isIncluded(getIncludePrefix(), job.fullName)
+                        Boolean includeJob = isIncluded(getIncludePrefix(), job.fullName, log_trace_id)
                         if(includeJob && getExcludePrefix()) {
-                            includeJob = !isIncluded(getExcludePrefix(), job.fullName)
+                            includeJob = !isIncluded(getExcludePrefix(), job.fullName, log_trace_id)
                         }
                         Boolean remoteMatches = job?.sources?.any {
                             (it?.source instanceof AbstractGitSCMSource) &&
@@ -153,8 +155,7 @@ public class JobExistsElsewhereTrait extends SCMSourceTrait {
                         // no parent jobs found so it is excluded
                         return true
                     }
-                    // head.name should be used to find matching item
-                    Boolean existsElsewhere = matchedParentJobs.any { !it.getItem(head.name)?.isDisabled() }
+                    Boolean existsElsewhere = matchedParentJobs.any { !it.getItem(trace_target)?.isDisabled() }
                     if(existsElsewhere) {
                         // job found so create a companion pipeline job
                         return false
@@ -167,7 +168,7 @@ public class JobExistsElsewhereTrait extends SCMSourceTrait {
                     Long timeLimit = Instant.now().epochSecond + getTimeToSearch().toLong()
                     while(Instant.now().epochSecond < timeLimit) {
                         sleep(ThreadLocalRandom.current().nextLong(1000, 3001))
-                        existsElsewhere = matchedParentJobs.any { !it.getItem(head.name)?.isDisabled() }
+                        existsElsewhere = matchedParentJobs.any { !it.getItem(trace_target)?.isDisabled() }
                         if(existsElsewhere) {
                             // job found so create a companion pipeline job
                             return false

@@ -59,13 +59,11 @@ public class JobExistsElsewhereTrait extends SCMSourceTrait {
     // serialization version
     private static final long serialVersionUID = 1L
     @NonNull
-    private final String includePrefix
+    private final String includePrefix = ''
     @NonNull
-    private final String excludePrefix
+    private final String excludePrefix = ''
     @NonNull
-    private final Boolean requireParentPipeline
-    @NonNull
-    private final Integer timeToSearch
+    private final Integer timeToSearch = 60
 
     private transient static final Logger LOGGER = Logger.getLogger(JobExistsElsewhereTrait.name)
 

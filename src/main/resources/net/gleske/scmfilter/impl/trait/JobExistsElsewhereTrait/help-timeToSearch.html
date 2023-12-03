@@ -1,0 +1,31 @@
+<!--
+Copyright 2014-2023 Sam Gleske
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+<div>
+  <p>This is a time limit (in seconds) for how long this trait will wait for companion jobs to exist in matched pipelines (pipelines are matched from the above include or exclude filters).</p>
+  <p>
+    If the value is zero, then no grace period will be considered.  If the
+    companion job does not immediately exist then it will assume there's no
+    match.  This is not typical for cloud-based systems where there will likely
+    be delays.  A recommended value of 60 seconds is the default and you can
+    set this to be higher if needed.
+  </p>
+</div>

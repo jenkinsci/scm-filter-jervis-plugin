@@ -21,6 +21,9 @@
  */
 package net.gleske.scmfilter.impl.trait
 
+// static imports
+import static net.gleske.jervis.tools.SecurityIO.sha256Sum
+
 // Jenkins imports
 import edu.umd.cs.findbugs.annotations.CheckForNull
 import edu.umd.cs.findbugs.annotations.NonNull

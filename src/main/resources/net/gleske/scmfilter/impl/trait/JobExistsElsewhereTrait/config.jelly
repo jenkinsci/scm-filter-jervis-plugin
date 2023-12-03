@@ -27,7 +27,7 @@ SOFTWARE.
   <f:entry title="${%Exclude jobs with prefix or pattern}" field="excludePrefix">
     <f:textbox default="" />
   </f:entry>
-  <f:entry title="${%Exclude jobs with prefix or pattern}" field="excludePrefix">
+  <f:entry title="${%Exclude jobs with prefix or pattern}" field="timeToSearch">
     <f:number default="60" min="0" />
   </f:entry>
 </j:jelly>

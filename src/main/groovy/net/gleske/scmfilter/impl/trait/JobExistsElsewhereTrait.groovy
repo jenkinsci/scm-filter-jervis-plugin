@@ -136,12 +136,17 @@ public class JobExistsElsewhereTrait extends SCMSourceTrait {
                     }
                     String remote = source.getRemote()
                     List matchedParentJobs = Jenkins.instance.getAllItems(WorkflowMultiBranchProject).findAll { job ->
-                        isIncluded(getIncludePrefix(), job.fullName) &&
-                        !isIncluded(getExcludePrefix(), job.fullName) &&
-                        job?.sources?.any {
+                        Boolean includeJob = isIncluded(getIncludePrefix(), job.fullName)
+                        if(includeJob && getExcludePrefix()) {
+                            includeJob = !isIncluded(getExcludePrefix(), job.fullName)
+                        }
+                        Boolean remoteMatches = job?.sources?.any {
                             (it?.source instanceof AbstractGitSCMSource) &&
                             it?.source?.getRemote() == remote
-                        } == true
+                        } ?: false
+
+                        // should the job be matched?
+                        includeJob && remoteMatches
                     }
                     if(!matchedParentJobs) {
                         LOGGER.finer("(trace-${log_trace_id}) no matching multibranch pipelines found.")

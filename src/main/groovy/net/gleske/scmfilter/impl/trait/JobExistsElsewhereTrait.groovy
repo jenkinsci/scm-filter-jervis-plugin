@@ -158,7 +158,7 @@ public class JobExistsElsewhereTrait extends SCMSourceTrait {
                         // no parent jobs found so it is excluded
                         return true
                     }
-                    Boolean existsElsewhere = matchedParentJobs.any { !it.getItem(trace_target)?.isDisabled() }
+                    Boolean existsElsewhere = matchedParentJobs.any { it.getItem(trace_target)?.isDisabled() }
                     if(existsElsewhere) {
                         // job found so create a companion pipeline job
                         return false
@@ -171,7 +171,7 @@ public class JobExistsElsewhereTrait extends SCMSourceTrait {
                     Long timeLimit = Instant.now().epochSecond + getTimeToSearch().toLong()
                     while(Instant.now().epochSecond < timeLimit) {
                         sleep(ThreadLocalRandom.current().nextLong(1000, 3001))
-                        existsElsewhere = matchedParentJobs.any { !it.getItem(trace_target)?.isDisabled() }
+                        existsElsewhere = matchedParentJobs.any { it.getItem(trace_target)?.isDisabled() }
                         if(existsElsewhere) {
                             // job found so create a companion pipeline job
                             return false

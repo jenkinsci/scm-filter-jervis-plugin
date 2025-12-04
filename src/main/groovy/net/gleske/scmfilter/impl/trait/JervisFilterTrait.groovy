@@ -32,19 +32,18 @@ import edu.umd.cs.findbugs.annotations.CheckForNull
 import edu.umd.cs.findbugs.annotations.NonNull
 import hudson.Extension
 import jenkins.model.Jenkins
-import jenkins.scm.api.SCMHead
-import jenkins.scm.api.SCMSource
 import jenkins.scm.api.mixin.ChangeRequestSCMHead
 import jenkins.scm.api.mixin.TagSCMHead
+import jenkins.scm.api.SCMHead
+import jenkins.scm.api.SCMSource
 import jenkins.scm.api.trait.SCMHeadPrefilter
 import jenkins.scm.api.trait.SCMSourceContext
 import jenkins.scm.api.trait.SCMSourceTrait
 import jenkins.scm.api.trait.SCMSourceTraitDescriptor
-import jenkins.scm.api.trait.SCMSourceTraitDescriptor
 import jenkins.scm.impl.trait.Selection
 import org.apache.commons.lang.StringUtils
-import org.jenkinsci.Symbol
 import org.jenkinsci.plugins.github_branch_source.GitHubSCMSource
+import org.jenkinsci.Symbol
 import org.kohsuke.stapler.DataBoundConstructor
 
 import java.time.Instant
@@ -196,7 +195,7 @@ public class JervisFilterTrait extends SCMSourceTrait {
         this.yamlFileName = StringUtils.defaultIfBlank(yamlFileName, DEFAULT_YAML_FILE)
     }
 
-    private static shouldExclude(def filters_obj, String target_ref, String log_trace_id) {
+    protected static shouldExclude(def filters_obj, String target_ref, String log_trace_id) {
         List filters = []
         String filter_type = 'only'
         if(filters_obj instanceof List) {

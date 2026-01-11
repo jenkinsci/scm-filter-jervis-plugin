@@ -31,7 +31,7 @@
   </scm>
 
   <properties>
-    <revision>2.0.1</revision>
+    <revision>2.2</revision>
     <changelist>999999-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/scm-filter-jervis-plugin</gitHubRepo>
     <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->

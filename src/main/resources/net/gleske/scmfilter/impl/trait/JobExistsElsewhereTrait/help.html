@@ -1,0 +1,92 @@
+<!--
+Copyright 2014-2023 Sam Gleske
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+<div>
+  <p>
+    This will search the Jenkins instance for other multibranch pipelines
+    configured with the same Git source.  If a job matching the same reference
+    exists in the other multibranch pipeline, then jobs will be created in this
+    one as well.  The intent is for repositories to have multiple multibranch
+    pipelines exist but a primary pipeline is used as a reference for creating
+    companion jobs instead of interacting with the Git SCM source.
+  </p>
+  <p>
+    This job provides include filters and exclude filters which are based on
+    the full name of the job (<tt>Item.fullName</tt>).  It will wait for jobs
+    to exist in other pipelines for a specified period of time (typically
+    called a grace period; in this case it is known as the
+    &quot;<tt>timeToSearch</tt>&quot;
+  </p>
+
+
+  <h1>Filters</h1>
+  <p>
+    There's two types of filters.  Empty value means the filter is ignored and
+    all jobs are allowed.
+  </p>
+  <ol>
+    <li>
+      Include jobs with prefix or pattern filter - Where a job full name MUST
+      start with the value specified.
+    </li>
+    <li>
+      Exclude jobs with prefix or pattern filter - Where a job full name MUST
+      NOT start with the value specified.
+    </li>
+  </ol>
+  <p>
+    Any filter (include or exclude) surrounded with <tt>/</tt> is treated as a
+    regular expression evaluated against the <tt>Item.fullName</tt>.  The
+    expression will use
+    <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#compile%28java.lang.String%29"><tt>Pattern.compile</tt></a>
+    to compile the regex string into a
+    <a href="http://docs.groovy-lang.org/latest/html/documentation/index.html#_regular_expression_operators">Groovy regular expression</a>.
+  </p>
+
+
+  <h1>What is a job full name</h1>
+  <p>
+    A job has a path in the URL of your browser such as
+    <tt>job/foo/job/bar</tt>.  In this example the job full name is
+    <tt>foo/bar</tt>.
+  </p>
+
+  <h3>Example prefix</h3>
+  <p>
+    For a job full name <tt>foo/bar</tt> a prefix <tt>foo</tt> will match any
+    job under the <tt>foo/</tt> path.  An exclude filter will have the opposite
+    effect.
+  </p>
+
+  <h3>Example pattern</h3>
+  <p>
+    For a job full name <tt>foo/bar</tt>, you can adopt a pattern
+    <tt>/^foo/.*/</tt> which will act similar to a prefix.  Patterns are more
+    flexible and apply to the entire job path and not just the beginning of the
+    job full name.
+  </p>
+  <p>
+    If you want to include two folders such as allowing all jobs under
+    <tt>foo/</tt> and <tt>baz/</tt> prefixes, you can adopt the following
+    pattern: <tt>/^foo/.*|^baz/.*/</tt>.  The non-pattern prefix does not
+    support filtering multiple values like this.
+  </p>
+</div>

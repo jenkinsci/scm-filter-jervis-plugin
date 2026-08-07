@@ -42,7 +42,7 @@ import jenkins.scm.api.trait.SCMSourceTrait
 import jenkins.scm.api.trait.SCMSourceTraitDescriptor
 import jenkins.scm.api.trait.SCMSourceTraitDescriptor
 import jenkins.scm.impl.trait.Selection
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.jenkinsci.Symbol
 import org.jenkinsci.plugins.github_branch_source.GitHubSCMSource
 import org.kohsuke.stapler.DataBoundConstructor
